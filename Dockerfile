@@ -1,7 +1,9 @@
-FROM debian:stable-slim
-COPY target/release/iroha .
+FROM rust:1.49-alpine
+RUN apk add libressl-dev musl-dev libc-dev
+COPY . src/
 COPY iroha/config.json .
-RUN apt-get update && apt-get -y upgrade && apt-get install -y libssl-dev
-RUN ln -s -f /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0
-RUN ln -s -f /usr/lib/x86_64-linux-gnu/libssl.so.1.1 /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 
+WORKDIR src
+RUN cargo build
+RUN cp target/release/iroha ..
+WORKDIR ..
 CMD ["./iroha"]
